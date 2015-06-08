@@ -9,14 +9,22 @@ public class InstanceGen {
 	private int distances[] [];
 	private int instCount = 0;
 	
-    public InstanceGen(String url) {
+    public InstanceGen(String url, boolean invert) {
     	
     	try {
         		URL myUrl = new URL(url);
 				Scanner s = new Scanner(myUrl.openStream());
 				instCount = retrieveCount(s);
-		    	flows = getMatrix(instCount,s);
-		    	distances = getMatrix(instCount,s);
+				if(invert)
+				{
+			    	flows = getMatrix(instCount,s);
+			    	distances = getMatrix(instCount,s);
+				}
+				else
+				{
+			    	distances = getMatrix(instCount,s);		
+			    	flows = getMatrix(instCount,s);			
+				}
 				s.close();
     		}
     		catch(IOException ex) {

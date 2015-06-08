@@ -76,6 +76,11 @@ public class View extends JFrame
 		panel_1.setBounds(594, 11, 656, 35);
 		getContentPane().add(panel_1);
 		
+		JCheckBox chckbxInvertMatrixes = new JCheckBox("Invert Matrixes");
+		panel_1.add(chckbxInvertMatrixes);
+
+	    JCheckBox chckbxElitism = new JCheckBox("Elitism");
+		
 		comboBox = new JComboBox();
 		comboBox.setEditable(true);
 		panel_1.add(comboBox);
@@ -88,8 +93,20 @@ public class View extends JFrame
 		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/had18.dat");
 		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/had20.dat");
 		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/had20.dat");
+		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/tai17a.dat");
+		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/tai25a.dat");
 		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/tai30a.dat");
 		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/tai40a.dat");
+		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/tai50a.dat");
+		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/chr12a.dat");
+		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/chr20a.dat");
+		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/chr25a.dat");
+		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/els19.dat");
+		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/esc16e.dat");
+		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/esc32b.dat");
+		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/esc64a.dat");
+		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/tho30.dat");
+		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/tho40.dat");
 		
 		JButton btnGetInstance = new JButton("Get Instance");
 		panel_1.add(btnGetInstance);
@@ -106,6 +123,15 @@ public class View extends JFrame
 			public void actionPerformed(ActionEvent arg0) {
 				
 				String result = "";
+				
+
+				elitism = chckbxElitism.isSelected();
+				if(Integer.parseInt(textField_1.getText()) <= Integer.parseInt(textField.getText()))
+						elitismCount = Integer.parseInt(textField_1.getText());
+				else
+						elitismCount = Integer.parseInt(textField.getText());
+				GeneticAlg.initElite(elitism, elitismCount);
+				
 		        Population myPop = new Population(Integer.parseInt(textField.getText()), true);
 		        int oldMaximum = 0;
 		        int repeated = 0;
@@ -162,7 +188,11 @@ public class View extends JFrame
 		
 		btnGetInstance.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				InstanceGen begin = new InstanceGen(comboBox.getSelectedItem().toString());
+				InstanceGen begin;
+		    	if(chckbxInvertMatrixes.isSelected())
+		    		begin = new InstanceGen(comboBox.getSelectedItem().toString(), true);
+		    	else
+					begin = new InstanceGen(comboBox.getSelectedItem().toString(), false);
 				setNumberField(String.valueOf(begin.getInstanceCount()));
 				setFlowTextField(begin.printFlows());
 				setDistancesTextField(begin.printDistances());
@@ -205,6 +235,7 @@ public class View extends JFrame
 		lblFlowMatrix.setFont(new Font("Tahoma", Font.BOLD, 13));
 		
 		JScrollPane scrollBar = new JScrollPane(textArea_1);
+		scrollBar.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		panel_3.add(scrollBar, BorderLayout.CENTER);
 		scrollBar.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		
@@ -224,6 +255,7 @@ public class View extends JFrame
 		lblDistancesMatrix.setFont(new Font("Tahoma", Font.BOLD, 13));
 		
 		JScrollPane scrollBar_1 = new JScrollPane(textArea);
+		scrollBar_1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		panel_4.add(scrollBar_1, BorderLayout.CENTER);
 		scrollBar_1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		
@@ -282,7 +314,6 @@ public class View extends JFrame
 	    Component rigidArea = Box.createRigidArea(new Dimension(25, 20));
 	    panel_6.add(rigidArea);
 	    
-	    JCheckBox chckbxElitism = new JCheckBox("Elitism");
 	    panel_6.add(chckbxElitism);
 	    
 	    textField_1 = new JTextField();
@@ -298,7 +329,7 @@ public class View extends JFrame
 			}
 		});
 	    
-	    textField_1.getDocument().addDocumentListener(new DocumentListener() {
+	    /*textField_1.getDocument().addDocumentListener(new DocumentListener() {
 			public void changedUpdate(DocumentEvent arg0) {
 				elitism = chckbxElitism.isSelected();
 				if(Integer.parseInt(textField_1.getText()) <= Integer.parseInt(textField.getText()))
@@ -323,7 +354,7 @@ public class View extends JFrame
 					elitismCount = Integer.parseInt(textField.getText());
 				GeneticAlg.initElite(elitism, elitismCount);
 			}
-		});
+		});*/
 	    
 	    rdbtnNewRadioButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
