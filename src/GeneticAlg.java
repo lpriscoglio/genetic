@@ -5,14 +5,17 @@ public class GeneticAlg {
 	/* GA parameters */
     private static final double crossRate = 0.5;
     private static final double crossChance = 1;
-    private static final double mutationRate = 0.0115;
+    private static final double mutationRate = 0.4115;
     private static final int tournamentSize = 5; // Velocità di convergenza?
     private static boolean elitism = false;
     private static int elitismCount = 1; // da testare, sembra ok TODO
     private static String selection = "Proportional"; //tournament / proportional / random
     private static String newPopSelection = "Steady"; //replacement / steady 
-    private static final boolean debug = false;
+    private static final boolean debug = false; 
+    private static final boolean debugMutation = false;
+    private static final boolean debugCrossover = false;
     private static int elitismOffset = 0;
+    public static int mutations = 0;
 
     /* Public methods */
     
@@ -66,19 +69,16 @@ public class GeneticAlg {
             if(newPopSelection == "Replacement")
             	newPopulation.saveIndividual(i, newIndiv);
             else if(newPopSelection == "Steady State") // Da testare, sembra ok, non ha senso partire da 0 perchè sono i migliori per def TODO
-            {
             	newPopulation.saveIndividual(newPopulation.getWorstId(elitismOffset), newIndiv);
-            }
             else
             	newPopulation.saveIndividual(i, newIndiv);
         }
-
         
         // Mutazioni random su tutti ma non sul migliore
-        for (int i = elitismOffset; i < newPopulation.count(); i++) {
+        for (int i = elitismOffset; i < newPopulation.count(); i++) 
+        {
             mutate(newPopulation.getIndividual(i)); 
         }
-        
 
         return newPopulation;
     }
@@ -88,22 +88,31 @@ public class GeneticAlg {
     // solo come sono ordinati: non possono esserci duplicati. Sulle slide lui fa una cosa strana. TODO
     
     private static Individual crossover(Individual indiv1, Individual indiv2) {
-        Individual newSol = new Individual();
-        // Loop through genes
-        for (int i = 0; i < indiv1.count(); i++) {
-            // Crossover
-            if (Math.random() <= crossRate && Math.random() <= crossChance) {
-                newSol.setGene(i, indiv1.getGene(i));
-            } else {
-                newSol.setGene(i, indiv2.getGene(i));
-            }
-        }
+    	Individual newSol;
+    	if(Math.random() <= 0.5)
+    		 newSol = indiv1.clone();
+    	else
+    		 newSol = indiv2.clone();
 
-        if(debug)
+        if(debugCrossover)
         {
 	        System.out.println("###");
 	        System.out.println("  Parent 1 genes: "+ indiv1.toString());
 	        System.out.println("  Parent 2 genes: "+ indiv2.toString());
+	        System.out.println("  NewSol genes: "+ newSol.toString());
+        }
+    		
+        // Loop through genes
+        for (int i = 0; i < indiv1.count(); i++) {
+            // Crossover
+            if (Math.random() <= crossRate && Math.random() <= crossChance) {
+                newSol.swapGenesByInsertion(i, indiv1.getGene(i));
+            } else {
+                newSol.swapGenesByInsertion(i, indiv2.getGene(i));
+            }
+        }
+        if(debugCrossover)
+        {
 	        System.out.println("  Crossover genes: "+ newSol.toString());
 	        System.out.println("###");
         }
@@ -114,17 +123,20 @@ public class GeneticAlg {
     private static void mutate(Individual indiv) {
         // Loop through genes
         for (int i = 0; i < indiv.count(); i++) {
+            if(debugMutation)
+            {
+                System.out.println("###");
+                System.out.println("  Individual was "+indiv.toString());
+            }
             if (Math.random() <= mutationRate) {
                 // Create random gene
-                int gene = (int) Math.round(Math.random() * 20);
-                indiv.setGene(i, gene);
-
-                if(debug)
+                int gene = (int) Math.round(Math.random() * (indiv.count()-1));
+                indiv.swapGenesByInsertion(i, gene);
+                if(debugMutation)
                 {
-	                System.out.println("###");
-	                System.out.println("  Individual gene "+i+" Mutated in this generation! It has value "+indiv.getGene(i));
-	                System.out.println("###");
+                    System.out.println("  Individual "+i+" MUTATED to "+indiv.toString());
                 }
+                mutations++;
             }
         }
     }

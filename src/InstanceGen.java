@@ -1,15 +1,16 @@
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Scanner;
 
 
 public class InstanceGen {
 
-	private int flows[] [];
-	private int distances[] [];
-	private int instCount = 0;
+	private static int flows[] [];
+	private static int distances[] [];
+	private static int instCount = 0;
 	
-    public InstanceGen(String url, boolean invert) {
+    public static void setInstanceGen(String url, boolean invert) {
     	
     	try {
         		URL myUrl = new URL(url);
@@ -36,22 +37,22 @@ public class InstanceGen {
     }
     
 	
-	public int getInstanceCount()
+	public static int getInstanceCount()
 	{
-		return this.instCount;
+		return instCount;
 	}	
 	
-	public int [][] getFlows()
+	public static int [][] getFlows()
 	{
-		return this.getFlows();
+		return flows;
 	}
 
-	public int [][] getDistances()
+	public static int [][] getDistances()
 	{
-		return this.getDistances();
+		return distances;
 	}
 	
-	public int retrieveCount(Scanner s)
+	public static int retrieveCount(Scanner s)
 	{
 		Scanner in;
 		if (s.hasNextLine()) 
@@ -63,7 +64,7 @@ public class InstanceGen {
 		return instCount;
 	}
 	
-	public int[][] getMatrix(int instCount, Scanner s)
+	public static int[][] getMatrix(int instCount, Scanner s)
 	{
 		Scanner in;
 		int [][] res = new int [instCount][instCount];
@@ -89,29 +90,23 @@ public class InstanceGen {
 		return res;
 	}
 	
-	public String printFlows()
+	public static String printFlows()
 	{
-		String result = "\n";
+		String result = "";
     	for(int i=0; i<instCount; i++)
 		{
-    		for(int j=0; j<instCount; j++)
-			{
-    			result+=flows[i][j]+" , "; 
-			}
+    		result+=Arrays.toString(flows[i]);
     		result += "\n";
 		}
     	return result;
 	}	
 	
-	public String printDistances()
+	public static String printDistances()
 	{
-		String result = "\n";
+		String result = "";
     	for(int i=0; i<instCount; i++)
 		{
-    		for(int j=0; j<instCount; j++)
-			{
-    			result+=distances[i][j]+ " , "; 
-			}
+    		result+=Arrays.toString(distances[i]);
     		result += "\n";
 		}
     	return result;

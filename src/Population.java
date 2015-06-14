@@ -9,7 +9,7 @@ public class Population {
         if (init) {
             // Loop and create individuals
             for (int i = 0; i < size; i++) {
-                Individual newIndividual = new Individual();
+                Individual newIndividual = new Individual(size,false);
                 saveIndividual(i, newIndividual);
             }
         }
@@ -24,7 +24,7 @@ public class Population {
         Individual fittest = individuals[0];
         // Loop through individuals to find fittest
         for (int i = 0; i < count(); i++) {
-            if (fittest.getFitness() <= getIndividual(i).getFitness()) {
+            if (fittest.getFitness() >= getIndividual(i).getFitness()) {
                 fittest = getIndividual(i);
             }
         }
@@ -38,7 +38,7 @@ public class Population {
         int result = start;
         // Loop through individuals to find fittest
         for (int i = start; i < count(); i++) {
-            if (unfittest.getFitness() >= getIndividual(i).getFitness()) {
+            if (unfittest.getFitness() <= getIndividual(i).getFitness()) {
                 unfittest = getIndividual(i);
                 result = i;
             }
@@ -52,7 +52,7 @@ public class Population {
         Individual fittest = individuals[start];
         // Loop through individuals to find fittest
         for (int i = start; i < count(); i++) {
-            if (fittest.getFitness() <= getIndividual(i).getFitness()) {
+            if (fittest.getFitness() >= getIndividual(i).getFitness()) {
                 fittest = getIndividual(i);
             }
         }
@@ -66,7 +66,7 @@ public class Population {
         int result = start;
         // Loop through individuals to find fittest
         for (int i = start; i < count(); i++) {
-            if (fittest.getFitness() <= getIndividual(i).getFitness()) {
+            if (fittest.getFitness() >= getIndividual(i).getFitness()) {
                 fittest = getIndividual(i);
                 result = i;
             }

@@ -8,6 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import java.awt.Container;
@@ -38,13 +39,18 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 import javax.swing.JCheckBox;
 import javax.swing.DropMode;
+
 import java.awt.Component;
+
 import javax.swing.Box;
+
 import java.awt.Dimension;
+import javax.swing.JProgressBar;
 
 
 public class View extends JFrame 
@@ -53,6 +59,7 @@ public class View extends JFrame
 	private JTextArea textArea;
 	private JTextArea textArea_1;
 	private JTextArea textArea_2;
+	private JProgressBar progressBar;
 	private JComboBox comboBox;
 	private String selection,newPop;
 	private int elitismCount;
@@ -110,6 +117,10 @@ public class View extends JFrame
 		
 		JButton btnGetInstance = new JButton("Get Instance");
 		panel_1.add(btnGetInstance);
+	    
+	    progressBar = new JProgressBar();
+	    progressBar.setBounds(594, 142, 656, 21);
+	    getContentPane().add(progressBar);
 		
 		JButton btnNewButton = new JButton("Solve");
 		btnNewButton.setEnabled(false);
@@ -123,7 +134,6 @@ public class View extends JFrame
 			public void actionPerformed(ActionEvent arg0) {
 				
 				String result = "";
-				
 
 				elitism = chckbxElitism.isSelected();
 				if(Integer.parseInt(textField_1.getText()) <= Integer.parseInt(textField.getText()))
@@ -133,13 +143,19 @@ public class View extends JFrame
 				GeneticAlg.initElite(elitism, elitismCount);
 				
 		        Population myPop = new Population(Integer.parseInt(textField.getText()), true);
+		        for(int i =0;i<Integer.parseInt(textField.getText());i++)
+		        {
+		        	System.out.print("Individuo "+i+" generato: "+Arrays.toString(myPop.getIndividual(i).getGenes())+ "con fitness "+myPop.getIndividual(i).getFitness());
+		        	System.out.println();
+		        }
 		        int oldMaximum = 0;
 		        int repeated = 0;
 		        
 		        // Evolve our population until we reach an optimum solution
 		        int generationCount = 0;
-		        while (myPop.getFittest().getFitness() < Fitness.getMaxFitness() && repeated < 100 && generationCount < 1000) {
+		        while ( myPop.getFittest().getFitness() > 600 && generationCount < 100000) {
 		            generationCount++;
+		            final int resCount = generationCount;
 		            if(oldMaximum == myPop.getFittest().getFitness())
 		            {
 		            	repeated++;
@@ -151,6 +167,11 @@ public class View extends JFrame
 		            }
 		            result+= "Generation: " + generationCount + " Fittest: " + myPop.getFittest().getFitness()+"\n";
 		            myPop = GeneticAlg.evolvePopulation(myPop);
+	                SwingUtilities.invokeLater(new Runnable() {
+	                  public void run() {
+	                    progressBar.setValue(resCount);
+	                  }
+	                });
 		        }
 		        result+="########\n";
 		        result+="Run on a population of "+textField.getText()+" individuals using "+selection+" selection and "+newPop+" offspring";
@@ -160,12 +181,9 @@ public class View extends JFrame
 		        	result+="\n";
 		        result+="Feasible solution found: "+myPop.getFittest().getFitness()+"! Maximum possible is "+Fitness.getMaxFitness()+"\n";
 		        result+="First generation of solution: " + (generationCount-repeated)+"\n";
-		        result+="Genes: [ ";
-		        for (int k = 0 ; k<myPop.getFittest().count(); k++)
-		        {
-		        	result+=myPop.getFittest().getGene(k) + " , ";
-		        }
-		        result+=" ]\n";
+		        result+="Mutations Count: " + GeneticAlg.mutations+"\n";
+		        result+="Genes: "+Arrays.toString((myPop.getFittest().getGenes()));
+		        result+=" \n";
 		    	setResult(result);
 		    	if(chckbxLog.isSelected())
 		    	{
@@ -188,20 +206,19 @@ public class View extends JFrame
 		
 		btnGetInstance.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				InstanceGen begin;
 		    	if(chckbxInvertMatrixes.isSelected())
-		    		begin = new InstanceGen(comboBox.getSelectedItem().toString(), true);
+		    		InstanceGen.setInstanceGen(comboBox.getSelectedItem().toString(), true);
 		    	else
-					begin = new InstanceGen(comboBox.getSelectedItem().toString(), false);
-				setNumberField(String.valueOf(begin.getInstanceCount()));
-				setFlowTextField(begin.printFlows());
-				setDistancesTextField(begin.printDistances());
+		    		InstanceGen.setInstanceGen(comboBox.getSelectedItem().toString(), false);
+				setNumberField(String.valueOf(InstanceGen.getInstanceCount()));
+				setFlowTextField(InstanceGen.printFlows());
+				setDistancesTextField(InstanceGen.printDistances());
 				btnNewButton.setEnabled(true);
 			}
 		});
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(594, 142, 660, 488);
+		panel_2.setBounds(594, 174, 660, 456);
 		getContentPane().add(panel_2);
 		panel_2.setLayout(new BorderLayout(0, 0));
 		
@@ -393,6 +410,7 @@ public class View extends JFrame
 	    JRadioButton rdbtnNewRadioButton_3 = new JRadioButton("Steady State");
 	    panel_7.add(rdbtnNewRadioButton_3);
 	    group_1.add(rdbtnNewRadioButton_3);
+	    
 	    rdbtnNewRadioButton_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				newPop = arg0.getActionCommand();
@@ -426,6 +444,10 @@ public class View extends JFrame
 	{
 		textArea.setText(txt);
 	}
+	
+	  public void updateBar(int newValue) {
+		    progressBar.setValue(newValue);
+		  }
 	
 
 	public void setResult(String txt)
