@@ -3,13 +3,13 @@ public class Population {
 
 	private Individual [] individuals;
 	
-    public Population(int size, boolean init) {
-        individuals = new Individual[size];
+    public Population(int popSize, int indSize, boolean init) {
+        individuals = new Individual[popSize];
         // Initialize population
         if (init) {
             // Loop and create individuals
-            for (int i = 0; i < size; i++) {
-                Individual newIndividual = new Individual(size,false);
+            for (int i = 0; i < popSize; i++) {
+                Individual newIndividual = new Individual(indSize,false);
                 saveIndividual(i, newIndividual);
             }
         }
@@ -29,6 +29,17 @@ public class Population {
             }
         }
         return fittest;
+    }
+    
+    public Individual getWorst() {
+        Individual unfittest = individuals[0];
+        // Loop through individuals to find fittest
+        for (int i = 0; i < count(); i++) {
+            if (unfittest.getFitness() <= getIndividual(i).getFitness()) {
+                unfittest = getIndividual(i);
+            }
+        }
+        return unfittest;
     }
     
     public int getWorstId(int start) {

@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class GeneticAlg {
 
@@ -5,7 +8,7 @@ public class GeneticAlg {
 	/* GA parameters */
     private static final double crossRate = 0.5;
     private static final double crossChance = 1;
-    private static final double mutationRate = 0.4115;
+    private static final double mutationRate = 0.1115;
     private static final int tournamentSize = 5; // Velocità di convergenza?
     private static boolean elitism = false;
     private static int elitismCount = 1; // da testare, sembra ok TODO
@@ -16,12 +19,14 @@ public class GeneticAlg {
     private static final boolean debugCrossover = false;
     private static int elitismOffset = 0;
     public static int mutations = 0;
+    private static int geneCount = 0;
 
     /* Public methods */
     
     // Evoluzione
     public static Population evolvePopulation(Population pop) {
-        Population newPopulation = new Population(pop.count(), false);
+        geneCount = pop.getIndividual(0).count();
+        Population newPopulation = new Population(pop.count(), geneCount, false);
         newPopulation = pop;
 
         // Con l'elitism tengo sempre il migliore individuo a prescindere
@@ -48,8 +53,8 @@ public class GeneticAlg {
         	
         	if(selection == "Tournament")
         	{
-        		ind1 = tournamentSelection(pop);
-        		ind2 = tournamentSelection(pop);
+        		ind1 = tournamentSelection(pop, geneCount);
+        		ind2 = tournamentSelection(pop, geneCount);
         	}
         	else if(selection == "Proportional")
         	{
@@ -65,11 +70,14 @@ public class GeneticAlg {
                 ind2 = pop.getIndividual(i2);
         	}
                 
-            Individual newIndiv = crossover(ind1, ind2);
+            Individual newIndiv = crossover(ind1, ind2, geneCount);
             if(newPopSelection == "Replacement")
             	newPopulation.saveIndividual(i, newIndiv);
             else if(newPopSelection == "Steady State") // Da testare, sembra ok, non ha senso partire da 0 perchè sono i migliori per def TODO
-            	newPopulation.saveIndividual(newPopulation.getWorstId(elitismOffset), newIndiv);
+            {
+            	if(newPopulation.getWorst().getFitness() > newIndiv.getFitness())
+            		newPopulation.saveIndividual(newPopulation.getWorstId(elitismOffset), newIndiv);
+            }
             else
             	newPopulation.saveIndividual(i, newIndiv);
         }
@@ -77,7 +85,7 @@ public class GeneticAlg {
         // Mutazioni random su tutti ma non sul migliore
         for (int i = elitismOffset; i < newPopulation.count(); i++) 
         {
-            mutate(newPopulation.getIndividual(i)); 
+            mutate(newPopulation.getIndividual(i), geneCount); 
         }
 
         return newPopulation;
@@ -87,9 +95,10 @@ public class GeneticAlg {
     // problema che abbiamo noi ogni gene può esistere una sola volta nell'individuo, dato che la questione è
     // solo come sono ordinati: non possono esserci duplicati. Sulle slide lui fa una cosa strana. TODO
     
-    private static Individual crossover(Individual indiv1, Individual indiv2) {
+    private static Individual crossover(Individual indiv1, Individual indiv2, int genes) {
     	Individual newSol;
-    	if(Math.random() <= 0.5)
+    	List<Integer> temp = new ArrayList<Integer>();
+    	if(Math.random() <= crossRate)
     		 newSol = indiv1.clone();
     	else
     		 newSol = indiv2.clone();
@@ -103,12 +112,14 @@ public class GeneticAlg {
         }
     		
         // Loop through genes
-        for (int i = 0; i < indiv1.count(); i++) {
+        for (int i = 0; i < genes; i++) {
             // Crossover
             if (Math.random() <= crossRate && Math.random() <= crossChance) {
                 newSol.swapGenesByInsertion(i, indiv1.getGene(i));
+                temp.add(indiv1.getGene(i));
             } else {
                 newSol.swapGenesByInsertion(i, indiv2.getGene(i));
+                temp.add(indiv2.getGene(i));
             }
         }
         if(debugCrossover)
@@ -120,9 +131,9 @@ public class GeneticAlg {
     }
 
     // La mutation la farei come semplice scambio casuale di due locations tra due individui.. TODO
-    private static void mutate(Individual indiv) {
+    private static void mutate(Individual indiv, int genes) {
         // Loop through genes
-        for (int i = 0; i < indiv.count(); i++) {
+        for (int i = 0; i < genes; i++) {
             if(debugMutation)
             {
                 System.out.println("###");
@@ -142,17 +153,16 @@ public class GeneticAlg {
     }
 
     // Due gruppi di n individui, tra i due migliori di ciascuno viene poi effettuato il crossover
-    private static Individual tournamentSelection(Population pop) {
+    private static Individual tournamentSelection(Population pop, int genes) {
         // Create a tournament population
     	Individual fittest;
-        Population tournament = new Population(tournamentSize, false);
+        Population tournament = new Population(tournamentSize, genes, false);
         // For each place in the tournament get a random individual
         for (int i = 0; i < tournamentSize; i++) {
             int randomId = (int) (Math.random() * pop.count());
             tournament.saveIndividual(i, pop.getIndividual(randomId));
         }
         fittest = tournament.getFittest();
-        	
         return fittest;
     }
     

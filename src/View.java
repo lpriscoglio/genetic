@@ -61,10 +61,13 @@ public class View extends JFrame
 	private JTextArea textArea_2;
 	private JProgressBar progressBar;
 	private JComboBox comboBox;
+	private JCheckBox chckbxLog;
 	private String selection,newPop;
 	private int elitismCount;
 	private boolean elitism;
 	private JTextField textField_1;
+	private JTextField textField_2;
+	private JTextField textField_3;
 	
 	public View() {
 		selection = "Tournament";
@@ -120,6 +123,7 @@ public class View extends JFrame
 	    
 	    progressBar = new JProgressBar();
 	    progressBar.setBounds(594, 142, 656, 21);
+        progressBar.setMinimum(0);
 	    getContentPane().add(progressBar);
 		
 		JButton btnNewButton = new JButton("Solve");
@@ -127,80 +131,89 @@ public class View extends JFrame
 		panel_1.add(btnNewButton);
 		btnNewButton.setFont(new Font("Tahoma", Font.BOLD, 14));
 		
-		JCheckBox chckbxLog = new JCheckBox("Print Log");
-		panel_1.add(chckbxLog);
-		
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
-				String result = "";
-
-				elitism = chckbxElitism.isSelected();
-				if(Integer.parseInt(textField_1.getText()) <= Integer.parseInt(textField.getText()))
-						elitismCount = Integer.parseInt(textField_1.getText());
-				else
-						elitismCount = Integer.parseInt(textField.getText());
-				GeneticAlg.initElite(elitism, elitismCount);
-				
-		        Population myPop = new Population(Integer.parseInt(textField.getText()), true);
-		        for(int i =0;i<Integer.parseInt(textField.getText());i++)
-		        {
-		        	System.out.print("Individuo "+i+" generato: "+Arrays.toString(myPop.getIndividual(i).getGenes())+ "con fitness "+myPop.getIndividual(i).getFitness());
-		        	System.out.println();
-		        }
-		        int oldMaximum = 0;
-		        int repeated = 0;
-		        
-		        // Evolve our population until we reach an optimum solution
-		        int generationCount = 0;
-		        while ( myPop.getFittest().getFitness() > 600 && generationCount < 100000) {
-		            generationCount++;
-		            final int resCount = generationCount;
-		            if(oldMaximum == myPop.getFittest().getFitness())
-		            {
-		            	repeated++;
-		            }
-		            else
-		            {
-		            	repeated = 0;
-		            	oldMaximum = myPop.getFittest().getFitness();
-		            }
-		            result+= "Generation: " + generationCount + " Fittest: " + myPop.getFittest().getFitness()+"\n";
-		            myPop = GeneticAlg.evolvePopulation(myPop);
-	                SwingUtilities.invokeLater(new Runnable() {
-	                  public void run() {
-	                    progressBar.setValue(resCount);
-	                  }
-	                });
-		        }
-		        result+="########\n";
-		        result+="Run on a population of "+textField.getText()+" individuals using "+selection+" selection and "+newPop+" offspring";
-		        if(elitism)
-		        	result+=" . Using elitism with "+elitismCount+" individuals \n";
-		        else
-		        	result+="\n";
-		        result+="Feasible solution found: "+myPop.getFittest().getFitness()+"! Maximum possible is "+Fitness.getMaxFitness()+"\n";
-		        result+="First generation of solution: " + (generationCount-repeated)+"\n";
-		        result+="Mutations Count: " + GeneticAlg.mutations+"\n";
-		        result+="Genes: "+Arrays.toString((myPop.getFittest().getGenes()));
-		        result+=" \n";
-		    	setResult(result);
-		    	if(chckbxLog.isSelected())
-		    	{
-			    	PrintWriter writer;
-					try {
-						writer = new PrintWriter("result.log", "UTF-8");
-						DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-						Date date = new Date();
-				        result+=dateFormat.format(date);
-				    	writer.print(result);
-				    	writer.close();
-					} catch (FileNotFoundException e) {
-						e.printStackTrace();
-					} catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
-					}
-		    	}
+				new Thread(new Runnable() {
+			        public void run(){
+			        	long start_time = System.currentTimeMillis();
+						long end_time;
+						long difference;
+						String result = "";
+				        progressBar.setMaximum(Integer.parseInt(textField_3.getText()));
+		
+						elitism = chckbxElitism.isSelected();
+						if(Integer.parseInt(textField_1.getText()) <= Integer.parseInt(textField.getText()))
+								elitismCount = Integer.parseInt(textField_1.getText());
+						else
+								elitismCount = 1;
+						GeneticAlg.initElite(elitism, elitismCount);
+						
+				        Population myPop = new Population(Integer.parseInt(textField_2.getText()),Integer.parseInt(textField.getText()), true);
+				        for(int i =0;i<Integer.parseInt(textField_2.getText());i++)
+				        {
+				        	result+="Individuo "+(i+1)+" generato: "+Arrays.toString(myPop.getIndividual(i).getGenes())+ ". Ha valore di fitness "+myPop.getIndividual(i).getFitness()+"\n";
+				        }
+				        int oldMaximum = 0;
+				        int repeated = 0;
+				        int improvements = 0;
+				        result+="\n";
+				        
+				        // Evolve our population until we reach an optimum solution
+				        int generationCount = 0;
+				        while (generationCount < Integer.parseInt(textField_3.getText())) {
+				            generationCount++;
+				            final int resCount = generationCount;
+				            if(oldMaximum == myPop.getFittest().getFitness())
+				            {
+				            	repeated++;
+				            }
+				            else
+				            {
+				            	repeated = 0;
+				            	improvements++;
+				            	oldMaximum = myPop.getFittest().getFitness();
+				            }
+				            //result+= "Generation: " + generationCount + " Fittest: " + myPop.getFittest().getFitness()+"\n";
+				            myPop = GeneticAlg.evolvePopulation(myPop);
+			                SwingUtilities.invokeLater(new Runnable() {
+			                  public void run() {
+			                    progressBar.setValue(resCount);
+			                  }
+			                });
+				        }
+				        result+="########\n";
+				        result+="Run on a population of "+textField_2.getText()+" individuals using "+selection+" selection and "+newPop+" offspring";
+				        if(elitism)
+				        	result+=" . Using elitism with "+elitismCount+" individuals \n";
+				        else
+				        	result+="\n";
+				        result+="Feasible solution found: "+myPop.getFittest().getFitness()+"! Maximum possible is "+Fitness.getMaxFitness()+"\n";
+				        result+="First generation of solution: " + (generationCount-repeated)+"\n";
+				        result+="Improvements Count: " + improvements+"\n";
+				        result+="Genes: "+Arrays.toString((myPop.getFittest().getGenes()));
+				        result+=" \n";
+				    	if(chckbxLog.isSelected())
+				    	{
+					    	PrintWriter writer;
+							try {
+								writer = new PrintWriter("result.log", "UTF-8");
+								DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+								Date date = new Date();
+						        result+=dateFormat.format(date);
+						    	writer.print(result);
+						    	writer.close();
+							} catch (FileNotFoundException e) {
+								e.printStackTrace();
+							} catch (UnsupportedEncodingException e) {
+								e.printStackTrace();
+							}
+				    	}
+						end_time = System.currentTimeMillis();
+						difference = end_time-start_time;
+				        result+=" Total time: "+difference+" ms\n";
+				    	setResult(result);
+			        }
+			    }).start();
 			}
 		});
 		
@@ -277,11 +290,11 @@ public class View extends JFrame
 		scrollBar_1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		
 		JPanel panel = new JPanel();
-		panel.setBounds(376, 16, 166, 30);
+		panel.setBounds(324, 16, 62, 30);
 		getContentPane().add(panel);
 		panel.setLayout(new BorderLayout(0, 0));
 		
-		JLabel lblNewLabel = new JLabel("Number of locations");
+		JLabel lblNewLabel = new JLabel("Locations");
 		panel.add(lblNewLabel, BorderLayout.WEST);
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
 		
@@ -410,6 +423,35 @@ public class View extends JFrame
 	    JRadioButton rdbtnNewRadioButton_3 = new JRadioButton("Steady State");
 	    panel_7.add(rdbtnNewRadioButton_3);
 	    group_1.add(rdbtnNewRadioButton_3);
+	    
+	    chckbxLog = new JCheckBox("Print Log");
+	    panel_7.add(chckbxLog);
+	    
+	    JPanel panel_8 = new JPanel();
+	    panel_8.setBounds(396, 16, 75, 30);
+	    getContentPane().add(panel_8);
+	    panel_8.setLayout(new BorderLayout(0, 0));
+	    
+	    JLabel lblIndividuals = new JLabel("Individuals");
+	    lblIndividuals.setFont(new Font("Tahoma", Font.BOLD, 11));
+	    panel_8.add(lblIndividuals, BorderLayout.NORTH);
+	    
+	    textField_2 = new JTextField();
+	    panel_8.add(textField_2, BorderLayout.CENTER);
+	    textField_2.setColumns(10);
+	    
+	    JPanel panel_9 = new JPanel();
+	    panel_9.setBounds(479, 16, 75, 30);
+	    getContentPane().add(panel_9);
+	    panel_9.setLayout(new BorderLayout(0, 0));
+	    
+	    JLabel lblIterations = new JLabel("Iterations");
+	    lblIterations.setFont(new Font("Tahoma", Font.BOLD, 11));
+	    panel_9.add(lblIterations, BorderLayout.NORTH);
+	    
+	    textField_3 = new JTextField();
+	    textField_3.setColumns(10);
+	    panel_9.add(textField_3, BorderLayout.CENTER);
 	    
 	    rdbtnNewRadioButton_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
