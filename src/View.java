@@ -8,74 +8,55 @@ import javax.swing.JLabel;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import java.awt.Container;
 import java.awt.Font;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.FlowLayout;
 import java.awt.BorderLayout;
 
-import javax.swing.BoxLayout;
-
-import java.awt.GridLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-
-import javax.swing.JScrollBar;
 import javax.swing.JRadioButton;
 import javax.swing.border.LineBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import java.awt.Color;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
 
 import javax.swing.JCheckBox;
-import javax.swing.DropMode;
 
 import java.awt.Component;
 
 import javax.swing.Box;
 
 import java.awt.Dimension;
+
 import javax.swing.JProgressBar;
 
 
 public class View extends JFrame 
 {
-	private JTextField textField;
-	private JTextArea textArea;
-	private JTextArea textArea_1;
-	private JTextArea textArea_2;
+	/**
+	 * Rappresenta la finestra principale
+	 */
+	private static final long serialVersionUID = 1L;
+	private JTextField textField_Locations;
+	private JTextArea distancesArea;
+	private JTextArea flowArea;
+	private JTextArea resultArea;
 	private JProgressBar progressBar;
-	private JComboBox comboBox;
-	private JCheckBox chckbxLog;
+	private JComboBox<String> comboBox;
+	private JCheckBox chckbxLog, chckbxElitism;
 	private String selection,newPop;
-	private int elitismCount;
-	private boolean elitism;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
+	private JTextField textField_ElitismCount;
+	private JTextField textField_Indiv;
+	private JTextField textField_Iterations;
+	private JRadioButton rdbtnTournament, rdbtnProportional, rdbtnRandom, rdbtnReplacement, rdbtnSteady;
+	private JCheckBox chckbxInvertMatrixes;
+	private JButton btnGetInstance, btnNewButton;
+	private SenseListener senseList;
 	
-	public View() {
+	public View() {		
 		selection = "Tournament";
 		newPop = "Replacement";
-		elitism = false;
-		elitismCount = 1;
 		GeneticAlg.init(selection, newPop);
-		GeneticAlg.initElite(elitism, elitismCount);
+		
 		getContentPane().setFont(new Font("Tahoma", Font.PLAIN, 13));
 		setTitle("Genetic Alg for QAM");
 		Container cont = getContentPane();
@@ -86,12 +67,12 @@ public class View extends JFrame
 		panel_1.setBounds(594, 11, 656, 35);
 		getContentPane().add(panel_1);
 		
-		JCheckBox chckbxInvertMatrixes = new JCheckBox("Invert Matrixes");
+		chckbxInvertMatrixes = new JCheckBox("Invert Matrixes");
 		panel_1.add(chckbxInvertMatrixes);
 
-	    JCheckBox chckbxElitism = new JCheckBox("Elitism");
+	    chckbxElitism = new JCheckBox("Elitism");
 		
-		comboBox = new JComboBox();
+		comboBox = new JComboBox<String>();
 		comboBox.setEditable(true);
 		panel_1.add(comboBox);
 		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/nug12.dat");
@@ -118,130 +99,32 @@ public class View extends JFrame
 		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/tho30.dat");
 		comboBox.addItem("http://anjos.mgi.polymtl.ca/qaplib/data.d/tho40.dat");
 		
-		JButton btnGetInstance = new JButton("Get Instance");
+		btnGetInstance = new JButton("Get Instance");
 		panel_1.add(btnGetInstance);
 	    
 	    progressBar = new JProgressBar();
 	    progressBar.setBounds(594, 142, 656, 21);
         progressBar.setMinimum(0);
+        progressBar.setStringPainted(true);
 	    getContentPane().add(progressBar);
 		
-		JButton btnNewButton = new JButton("Solve");
+		btnNewButton = new JButton("Solve");
 		btnNewButton.setEnabled(false);
 		panel_1.add(btnNewButton);
 		btnNewButton.setFont(new Font("Tahoma", Font.BOLD, 14));
-		
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				new Thread(new Runnable() {
-			        public void run(){
-			        	long start_time = System.currentTimeMillis();
-						long end_time;
-						long difference;
-						String result = "";
-				        progressBar.setMaximum(Integer.parseInt(textField_3.getText()));
-		
-						elitism = chckbxElitism.isSelected();
-						if(Integer.parseInt(textField_1.getText()) <= Integer.parseInt(textField.getText()))
-								elitismCount = Integer.parseInt(textField_1.getText());
-						else
-								elitismCount = 1;
-						GeneticAlg.initElite(elitism, elitismCount);
-						
-				        Population myPop = new Population(Integer.parseInt(textField_2.getText()),Integer.parseInt(textField.getText()), true);
-				        for(int i =0;i<Integer.parseInt(textField_2.getText());i++)
-				        {
-				        	result+="Individuo "+(i+1)+" generato: "+Arrays.toString(myPop.getIndividual(i).getGenes())+ ". Ha valore di fitness "+myPop.getIndividual(i).getFitness()+"\n";
-				        }
-				        int oldMaximum = 0;
-				        int repeated = 0;
-				        int improvements = 0;
-				        result+="\n";
-				        
-				        // Evolve our population until we reach an optimum solution
-				        int generationCount = 0;
-				        while (generationCount < Integer.parseInt(textField_3.getText())) {
-				            generationCount++;
-				            final int resCount = generationCount;
-				            if(oldMaximum == myPop.getFittest().getFitness())
-				            {
-				            	repeated++;
-				            }
-				            else
-				            {
-				            	repeated = 0;
-				            	improvements++;
-				            	oldMaximum = myPop.getFittest().getFitness();
-				            }
-				            //result+= "Generation: " + generationCount + " Fittest: " + myPop.getFittest().getFitness()+"\n";
-				            myPop = GeneticAlg.evolvePopulation(myPop);
-			                SwingUtilities.invokeLater(new Runnable() {
-			                  public void run() {
-			                    progressBar.setValue(resCount);
-			                  }
-			                });
-				        }
-				        result+="########\n";
-				        result+="Run on a population of "+textField_2.getText()+" individuals using "+selection+" selection and "+newPop+" offspring";
-				        if(elitism)
-				        	result+=" . Using elitism with "+elitismCount+" individuals \n";
-				        else
-				        	result+="\n";
-				        result+="Feasible solution found: "+myPop.getFittest().getFitness()+"! Maximum possible is "+Fitness.getMaxFitness()+"\n";
-				        result+="First generation of solution: " + (generationCount-repeated)+"\n";
-				        result+="Improvements Count: " + improvements+"\n";
-				        result+="Genes: "+Arrays.toString((myPop.getFittest().getGenes()));
-				        result+=" \n";
-				    	if(chckbxLog.isSelected())
-				    	{
-					    	PrintWriter writer;
-							try {
-								writer = new PrintWriter("result.log", "UTF-8");
-								DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-								Date date = new Date();
-						        result+=dateFormat.format(date);
-						    	writer.print(result);
-						    	writer.close();
-							} catch (FileNotFoundException e) {
-								e.printStackTrace();
-							} catch (UnsupportedEncodingException e) {
-								e.printStackTrace();
-							}
-				    	}
-						end_time = System.currentTimeMillis();
-						difference = end_time-start_time;
-				        result+=" Total time: "+difference+" ms\n";
-				    	setResult(result);
-			        }
-			    }).start();
-			}
-		});
-		
-		btnGetInstance.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-		    	if(chckbxInvertMatrixes.isSelected())
-		    		InstanceGen.setInstanceGen(comboBox.getSelectedItem().toString(), true);
-		    	else
-		    		InstanceGen.setInstanceGen(comboBox.getSelectedItem().toString(), false);
-				setNumberField(String.valueOf(InstanceGen.getInstanceCount()));
-				setFlowTextField(InstanceGen.printFlows());
-				setDistancesTextField(InstanceGen.printDistances());
-				btnNewButton.setEnabled(true);
-			}
-		});
 		
 		JPanel panel_2 = new JPanel();
 		panel_2.setBounds(594, 174, 660, 456);
 		getContentPane().add(panel_2);
 		panel_2.setLayout(new BorderLayout(0, 0));
 		
-		textArea_2 = new JTextArea();
-		textArea_2.setEditable(false);
-		textArea_2.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		textArea_2.setRows(30);
-		textArea_2.setLineWrap(true);
+		resultArea = new JTextArea();
+		resultArea.setEditable(false);
+		resultArea.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		resultArea.setRows(30);
+		resultArea.setLineWrap(true);
 		
-		JScrollPane scr = new JScrollPane(textArea_2);
+		JScrollPane scr = new JScrollPane(resultArea);
 		panel_2.add(scr, BorderLayout.CENTER);
 		scr.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		
@@ -254,17 +137,17 @@ public class View extends JFrame
 		getContentPane().add(panel_3);
 		panel_3.setLayout(new BorderLayout(0, 0));
 		
-		textArea_1 = new JTextArea();
-		textArea_1.setEditable(false);
-		textArea_1.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		textArea_1.setRows(15);
-		textArea_1.setLineWrap(true);
+		flowArea = new JTextArea();
+		flowArea.setEditable(false);
+		flowArea.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		flowArea.setRows(15);
+		flowArea.setLineWrap(false);
 		
 		JLabel lblFlowMatrix = new JLabel("Flow Matrix");
 		panel_3.add(lblFlowMatrix, BorderLayout.NORTH);
 		lblFlowMatrix.setFont(new Font("Tahoma", Font.BOLD, 13));
 		
-		JScrollPane scrollBar = new JScrollPane(textArea_1);
+		JScrollPane scrollBar = new JScrollPane(flowArea);
 		scrollBar.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		panel_3.add(scrollBar, BorderLayout.CENTER);
 		scrollBar.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -274,17 +157,17 @@ public class View extends JFrame
 		getContentPane().add(panel_4);
 		panel_4.setLayout(new BorderLayout(0, 0));
 		
-		textArea = new JTextArea();
-		textArea.setEditable(false);
-		textArea.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		textArea.setLineWrap(true);
-		textArea.setRows(10);
+		distancesArea = new JTextArea();
+		distancesArea.setEditable(false);
+		distancesArea.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		distancesArea.setLineWrap(false);
+		distancesArea.setRows(10);
 		
 		JLabel lblDistancesMatrix = new JLabel("Distances Matrix");
 		panel_4.add(lblDistancesMatrix, BorderLayout.NORTH);
 		lblDistancesMatrix.setFont(new Font("Tahoma", Font.BOLD, 13));
 		
-		JScrollPane scrollBar_1 = new JScrollPane(textArea);
+		JScrollPane scrollBar_1 = new JScrollPane(distancesArea);
 		scrollBar_1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		panel_4.add(scrollBar_1, BorderLayout.CENTER);
 		scrollBar_1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -298,10 +181,10 @@ public class View extends JFrame
 		panel.add(lblNewLabel, BorderLayout.WEST);
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
 		
-		textField = new JTextField();
-		textField.setEditable(false);
-		panel.add(textField, BorderLayout.SOUTH);
-		textField.setColumns(10);
+		textField_Locations = new JTextField();
+		textField_Locations.setEditable(false);
+		panel.add(textField_Locations, BorderLayout.SOUTH);
+		textField_Locations.setColumns(10);
 		
 		JPanel panel_5 = new JPanel();
 		panel_5.setBorder(new LineBorder(Color.DARK_GRAY, 1, true));
@@ -322,20 +205,20 @@ public class View extends JFrame
 		lblAlgorithmOptions.setFont(new Font("Tahoma", Font.BOLD, 13));
 		panel_6.add(lblAlgorithmOptions);
 		
-		JRadioButton rdbtnNewRadioButton = new JRadioButton("Tournament");
-		rdbtnNewRadioButton.setSelected(true);
-		panel_6.add(rdbtnNewRadioButton);
+		rdbtnTournament = new JRadioButton("Tournament");
+		rdbtnTournament.setSelected(true);
+		panel_6.add(rdbtnTournament);
 		
-		JRadioButton rdbtnNewRadioButton_1 = new JRadioButton("Proportional");
-		panel_6.add(rdbtnNewRadioButton_1);
+		rdbtnProportional = new JRadioButton("Proportional");
+		panel_6.add(rdbtnProportional);
 		
-		JRadioButton rdbtnRandom = new JRadioButton("Random");
+		rdbtnRandom = new JRadioButton("Random");
 		panel_6.add(rdbtnRandom);
 		
 	    ButtonGroup group = new ButtonGroup();
 	    ButtonGroup group_1 = new ButtonGroup();
-	    group.add(rdbtnNewRadioButton);
-	    group.add(rdbtnNewRadioButton_1);
+	    group.add(rdbtnTournament);
+	    group.add(rdbtnProportional);
 	    group.add(rdbtnRandom);
 	    
 	    Component horizontalGlue = Box.createHorizontalGlue();
@@ -346,64 +229,12 @@ public class View extends JFrame
 	    
 	    panel_6.add(chckbxElitism);
 	    
-	    textField_1 = new JTextField();
-	    textField_1.setText(Integer.toString(elitismCount));
-	    panel_6.add(textField_1);
-	    textField_1.setColumns(5);
+	    textField_ElitismCount = new JTextField();
+	    textField_ElitismCount.setText("1");
+	    panel_6.add(textField_ElitismCount);
+	    textField_ElitismCount.setColumns(5);
 	    
-	    chckbxElitism.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				elitism = chckbxElitism.isSelected();
-				elitismCount = Integer.parseInt(textField_1.getText());
-				GeneticAlg.initElite(elitism, elitismCount);
-			}
-		});
 	    
-	    /*textField_1.getDocument().addDocumentListener(new DocumentListener() {
-			public void changedUpdate(DocumentEvent arg0) {
-				elitism = chckbxElitism.isSelected();
-				if(Integer.parseInt(textField_1.getText()) <= Integer.parseInt(textField.getText()))
-						elitismCount = Integer.parseInt(textField_1.getText());
-				else
-						elitismCount = Integer.parseInt(textField.getText());
-				GeneticAlg.initElite(elitism, elitismCount);
-			}
-			public void removeUpdate(DocumentEvent arg0) {
-				elitism = chckbxElitism.isSelected();
-				if(Integer.parseInt(textField_1.getText()) <= Integer.parseInt(textField.getText()))
-					elitismCount = Integer.parseInt(textField_1.getText());
-			else
-					elitismCount = Integer.parseInt(textField.getText());
-				GeneticAlg.initElite(elitism, elitismCount);
-			}
-			public void insertUpdate(DocumentEvent arg0) {
-				elitism = chckbxElitism.isSelected();
-				if(Integer.parseInt(textField_1.getText()) <= Integer.parseInt(textField.getText()))
-					elitismCount = Integer.parseInt(textField_1.getText());
-				else
-					elitismCount = Integer.parseInt(textField.getText());
-				GeneticAlg.initElite(elitism, elitismCount);
-			}
-		});*/
-	    
-	    rdbtnNewRadioButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				selection = arg0.getActionCommand();
-				GeneticAlg.init(selection, newPop);
-			}
-		});
-	    rdbtnNewRadioButton_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				selection = arg0.getActionCommand();
-				GeneticAlg.init(selection, newPop);
-			}
-		});
-	    rdbtnRandom.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				selection = arg0.getActionCommand();
-				GeneticAlg.init(selection, newPop);
-			}
-		});
 	    
 	    JPanel panel_7 = new JPanel();
 	    panel_7.setBorder(new LineBorder(Color.DARK_GRAY, 1, true));
@@ -414,15 +245,15 @@ public class View extends JFrame
 	    label.setFont(new Font("Tahoma", Font.BOLD, 13));
 	    panel_7.add(label);
 	    
-		JRadioButton rdbtnNewRadioButton_2 = new JRadioButton("Replacement");
-		panel_7.add(rdbtnNewRadioButton_2);
-		rdbtnNewRadioButton_2.setSelected(true);
+		rdbtnReplacement = new JRadioButton("Replacement");
+		panel_7.add(rdbtnReplacement);
+		rdbtnReplacement.setSelected(true);
 		
-	    group_1.add(rdbtnNewRadioButton_2);
+	    group_1.add(rdbtnReplacement);
 	    
-	    JRadioButton rdbtnNewRadioButton_3 = new JRadioButton("Steady State");
-	    panel_7.add(rdbtnNewRadioButton_3);
-	    group_1.add(rdbtnNewRadioButton_3);
+	    rdbtnSteady = new JRadioButton("Steady State");
+	    panel_7.add(rdbtnSteady);
+	    group_1.add(rdbtnSteady);
 	    
 	    chckbxLog = new JCheckBox("Print Log");
 	    panel_7.add(chckbxLog);
@@ -436,9 +267,10 @@ public class View extends JFrame
 	    lblIndividuals.setFont(new Font("Tahoma", Font.BOLD, 11));
 	    panel_8.add(lblIndividuals, BorderLayout.NORTH);
 	    
-	    textField_2 = new JTextField();
-	    panel_8.add(textField_2, BorderLayout.CENTER);
-	    textField_2.setColumns(10);
+	    textField_Indiv = new JTextField();
+	    textField_Indiv.setText("40");
+	    panel_8.add(textField_Indiv, BorderLayout.CENTER);
+	    textField_Indiv.setColumns(10);
 	    
 	    JPanel panel_9 = new JPanel();
 	    panel_9.setBounds(479, 16, 75, 30);
@@ -449,51 +281,27 @@ public class View extends JFrame
 	    lblIterations.setFont(new Font("Tahoma", Font.BOLD, 11));
 	    panel_9.add(lblIterations, BorderLayout.NORTH);
 	    
-	    textField_3 = new JTextField();
-	    textField_3.setColumns(10);
-	    panel_9.add(textField_3, BorderLayout.CENTER);
+	    textField_Iterations = new JTextField();
+	    textField_Iterations.setText("5000");
+	    textField_Iterations.setColumns(10);
+	    panel_9.add(textField_Iterations, BorderLayout.CENTER);
 	    
-	    rdbtnNewRadioButton_3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				newPop = arg0.getActionCommand();
-				GeneticAlg.init(selection, newPop);
-			}
-		});
-	    
-	    rdbtnNewRadioButton_2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				newPop = arg0.getActionCommand();
-				GeneticAlg.init(selection, newPop);
-			}
-		});
 		
 		this.setVisible(true);
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-	}
-	
 
-	public void setNumberField(String txt)
-	{
-		textField.setText(txt);
+		senseList = new SenseListener(textField_Locations, textField_Iterations, textField_Indiv, textField_ElitismCount, progressBar,
+				chckbxElitism,chckbxLog,chckbxInvertMatrixes, resultArea, btnNewButton, btnGetInstance, comboBox, flowArea, distancesArea,
+				rdbtnTournament, rdbtnProportional, rdbtnRandom, rdbtnReplacement, rdbtnSteady);
+		
+	    rdbtnTournament.addActionListener(senseList);
+	    rdbtnProportional.addActionListener(senseList);
+	    rdbtnRandom.addActionListener(senseList);
+	    rdbtnSteady.addActionListener(senseList);
+	    rdbtnReplacement.addActionListener(senseList);
+		btnNewButton.addActionListener(senseList);
+		btnGetInstance.addActionListener(senseList);
+	    chckbxElitism.addItemListener(senseList);
 	}
 	
-	public void setFlowTextField(String txt)
-	{
-		textArea_1.setText(txt);
-	}
-
-	public void setDistancesTextField(String txt)
-	{
-		textArea.setText(txt);
-	}
-	
-	  public void updateBar(int newValue) {
-		    progressBar.setValue(newValue);
-		  }
-	
-
-	public void setResult(String txt)
-	{
-		textArea_2.setText(txt);
-	}
 }

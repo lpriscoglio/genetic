@@ -1,19 +1,15 @@
-import java.util.ArrayList;
-import java.util.List;
-
-
 public class GeneticAlg {
 
 	
 	/* GA parameters */
     private static final double crossRate = 0.5;
-    private static final double crossChance = 1;
+    //private static final double crossChance = 1;
     private static final double mutationRate = 0.1115;
-    private static final int tournamentSize = 5; // Velocità di convergenza?
+    private static final int tournamentSize = 5; // 
     private static boolean elitism = false;
-    private static int elitismCount = 1; // da testare, sembra ok TODO
-    private static String selection = "Proportional"; //tournament / proportional / random
-    private static String newPopSelection = "Steady"; //replacement / steady 
+    private static int elitismCount = 1; 
+    private static String selection = "Tournament"; //Tournament / Proportional / Random
+    private static String newPopSelection = "Replacement"; //Replacement / Steady State
     private static final boolean debug = false; 
     private static final boolean debugMutation = false;
     private static final boolean debugCrossover = false;
@@ -47,7 +43,6 @@ public class GeneticAlg {
         }
         // Loop over the population size and create new individuals with
         // crossover
-        // Fare la compare tra 1 e 2 e dare un vantaggio al migliore?
         for (int i = elitismOffset; i < pop.count(); i++) {
         	Individual ind1,ind2;
         	
@@ -91,46 +86,57 @@ public class GeneticAlg {
         return newPopulation;
     }
 
-    // Crossover -> Da cambiare, perchè qui posso cambiare i geni tra gli individui come voglio, ma nel
-    // problema che abbiamo noi ogni gene può esistere una sola volta nell'individuo, dato che la questione è
-    // solo come sono ordinati: non possono esserci duplicati. Sulle slide lui fa una cosa strana. TODO
+    // Crossover -> Scelta di un individuo base, poi scelgo per ognuno quale aggiungere e scambiare, e da quale genitore
     
     private static Individual crossover(Individual indiv1, Individual indiv2, int genes) {
     	Individual newSol;
-    	List<Integer> temp = new ArrayList<Integer>();
+    	int gene = (int) Math.round(Math.random() * (indiv1.count()-1));
+    	int [] oldGenes = new int[indiv1.count()];
     	if(Math.random() <= crossRate)
-    		 newSol = indiv1.clone();
+    	{
+    		for(int i = 0; i<indiv1.count(); i++)
+    		{
+    			oldGenes[i] = indiv1.getGene(i);
+    		}
+    		newSol = new Individual(indiv1.count(), oldGenes);
+    		newSol.swapGenesByInsertion(gene, indiv2.getGene(gene));
+    	}
     	else
-    		 newSol = indiv2.clone();
+    	{
+    		for(int i = 0; i<indiv2.count(); i++)
+    		{
+    			oldGenes[i] = indiv2.getGene(i);
+    		}
+    		newSol = new Individual(indiv2.count(), oldGenes);
+    		 newSol.swapGenesByInsertion(gene, indiv1.getGene(gene));
+    	}
 
         if(debugCrossover)
         {
-	        System.out.println("###");
+	        System.out.println("###"+gene);
 	        System.out.println("  Parent 1 genes: "+ indiv1.toString());
 	        System.out.println("  Parent 2 genes: "+ indiv2.toString());
 	        System.out.println("  NewSol genes: "+ newSol.toString());
         }
     		
-        // Loop through genes
+        /* Loop through genes
         for (int i = 0; i < genes; i++) {
             // Crossover
             if (Math.random() <= crossRate && Math.random() <= crossChance) {
                 newSol.swapGenesByInsertion(i, indiv1.getGene(i));
-                temp.add(indiv1.getGene(i));
             } else {
                 newSol.swapGenesByInsertion(i, indiv2.getGene(i));
-                temp.add(indiv2.getGene(i));
             }
         }
         if(debugCrossover)
         {
 	        System.out.println("  Crossover genes: "+ newSol.toString());
 	        System.out.println("###");
-        }
+        }*/
         return newSol;
     }
 
-    // La mutation la farei come semplice scambio casuale di due locations tra due individui.. TODO
+    // Semplice scambio random di location in un individuo
     private static void mutate(Individual indiv, int genes) {
         // Loop through genes
         for (int i = 0; i < genes; i++) {
@@ -212,7 +218,7 @@ public class GeneticAlg {
         	}
         }
         System.out.println("HUH? RANDOM "+randomId+" ");
-        return tournament.getIndividual(tournament.count()-1); //problemi con approssimazioni
+        return tournament.getIndividual(tournament.count()-1); //approssimazioni
     }
 
 	public static void init(String string, String string2) {

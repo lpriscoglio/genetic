@@ -6,7 +6,8 @@ public class Population {
     public Population(int popSize, int indSize, boolean init) {
         individuals = new Individual[popSize];
         // Initialize population
-        if (init) {
+        if (init) 
+        {
             // Loop and create individuals
             for (int i = 0; i < popSize; i++) {
                 Individual newIndividual = new Individual(indSize,false);
@@ -20,9 +21,9 @@ public class Population {
         return individuals[index];
     }
 
+    // Loop through individuals to find fittest
     public Individual getFittest() {
         Individual fittest = individuals[0];
-        // Loop through individuals to find fittest
         for (int i = 0; i < count(); i++) {
             if (fittest.getFitness() >= getIndividual(i).getFitness()) {
                 fittest = getIndividual(i);
@@ -30,10 +31,10 @@ public class Population {
         }
         return fittest;
     }
-    
+
+    // Loop through individuals to find worst
     public Individual getWorst() {
         Individual unfittest = individuals[0];
-        // Loop through individuals to find fittest
         for (int i = 0; i < count(); i++) {
             if (unfittest.getFitness() <= getIndividual(i).getFitness()) {
                 unfittest = getIndividual(i);
@@ -41,13 +42,13 @@ public class Population {
         }
         return unfittest;
     }
-    
+
+    // Loop through individuals to find the id of the worst
     public int getWorstId(int start) {
         if(start > count())
         	return count();
         Individual unfittest = individuals[start];
         int result = start;
-        // Loop through individuals to find fittest
         for (int i = start; i < count(); i++) {
             if (unfittest.getFitness() <= getIndividual(i).getFitness()) {
                 unfittest = getIndividual(i);

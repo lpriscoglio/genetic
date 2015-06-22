@@ -2,7 +2,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 
-public class Individual implements Cloneable{
+public class Individual{
 
 	private int possibleGenes;
 	private int [] geneSequence;
@@ -17,8 +17,16 @@ public class Individual implements Cloneable{
 			initGenes();
 	}
 	
+	public Individual(int genes, int[] genesValues)
+	{
+		this.fitnessVal = 0;
+		this.possibleGenes = genes;
+		this.geneSequence = genesValues;
+	}
+	
 	private void initGenes()
 	{
+        // Inizializzazione random dei geni di ciascuno
 		for (int i = 0; i < possibleGenes; i++) {
             geneSequence[i] = i;
         }    
@@ -26,7 +34,6 @@ public class Individual implements Cloneable{
         for (int i = geneSequence.length - 1; i > 0; i--)
         {
           int index = rnd.nextInt(i + 1);
-          // Simple swap
           int a = geneSequence[index];
           geneSequence[index] = geneSequence[i];
           geneSequence[i] = a;
@@ -48,6 +55,7 @@ public class Individual implements Cloneable{
 		this.fitnessVal = 0; //
 	}
 	
+	//Inserisco un nuovo valore in un gene arbitrario, per cui scambio il valore precedente con la posizione dove era prima il valore nuovo, per mantenere la consistenza
 	public void swapGenesByInsertion(int index, int value)
 	{
 		int oldVal = this.getGene(index); // Che valore c'era prima dove andrà il nuovo

@@ -10,8 +10,8 @@ public class InstanceGen {
 	private static int distances[] [];
 	private static int instCount = 0;
 	
+	//Scarico da internet l'istanza voluta
     public static void setInstanceGen(String url, boolean invert) {
-    	
     	try {
         		URL myUrl = new URL(url);
 				Scanner s = new Scanner(myUrl.openStream());
@@ -52,6 +52,7 @@ public class InstanceGen {
 		return distances;
 	}
 	
+	//Recupera il numero di locations
 	public static int retrieveCount(Scanner s)
 	{
 		Scanner in;
@@ -64,6 +65,7 @@ public class InstanceGen {
 		return instCount;
 	}
 	
+	//Recupera il doppio array di interi, flow o distance
 	public static int[][] getMatrix(int instCount, Scanner s)
 	{
 		Scanner in;
