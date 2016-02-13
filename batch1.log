@@ -1,0 +1,9 @@
+http://anjos.mgi.polymtl.ca/qaplib/data.d/nug12.dat
+
+
+########
+Run on a population of 40 individuals using Tournament selection and Replacement offspring . Using elitism with 1 individuals 
+Average solution found: 589.485 over 10000 iterations!
+ 
+ Total time taken: 2375 seconds
+2015/07/07 12:05:01

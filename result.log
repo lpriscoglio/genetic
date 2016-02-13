@@ -1,104 +1,93 @@
-Generation: 1 Fittest: 203
-Generation: 2 Fittest: 219
-Generation: 3 Fittest: 228
-Generation: 4 Fittest: 230
-Generation: 5 Fittest: 234
-Generation: 6 Fittest: 234
-Generation: 7 Fittest: 234
-Generation: 8 Fittest: 234
-Generation: 9 Fittest: 234
-Generation: 10 Fittest: 234
-Generation: 11 Fittest: 234
-Generation: 12 Fittest: 241
-Generation: 13 Fittest: 245
-Generation: 14 Fittest: 245
-Generation: 15 Fittest: 248
-Generation: 16 Fittest: 248
-Generation: 17 Fittest: 248
-Generation: 18 Fittest: 251
-Generation: 19 Fittest: 251
-Generation: 20 Fittest: 251
-Generation: 21 Fittest: 251
-Generation: 22 Fittest: 251
-Generation: 23 Fittest: 251
-Generation: 24 Fittest: 251
-Generation: 25 Fittest: 251
-Generation: 26 Fittest: 259
-Generation: 27 Fittest: 265
-Generation: 28 Fittest: 272
-Generation: 29 Fittest: 272
-Generation: 30 Fittest: 272
-Generation: 31 Fittest: 272
-Generation: 32 Fittest: 272
-Generation: 33 Fittest: 272
-Generation: 34 Fittest: 278
-Generation: 35 Fittest: 278
-Generation: 36 Fittest: 280
-Generation: 37 Fittest: 280
-Generation: 38 Fittest: 286
-Generation: 39 Fittest: 286
-Generation: 40 Fittest: 286
-Generation: 41 Fittest: 286
-Generation: 42 Fittest: 287
-Generation: 43 Fittest: 287
-Generation: 44 Fittest: 287
-Generation: 45 Fittest: 287
-Generation: 46 Fittest: 287
-Generation: 47 Fittest: 287
-Generation: 48 Fittest: 287
-Generation: 49 Fittest: 287
-Generation: 50 Fittest: 288
-Generation: 51 Fittest: 288
-Generation: 52 Fittest: 288
-Generation: 53 Fittest: 288
-Generation: 54 Fittest: 291
-Generation: 55 Fittest: 291
-Generation: 56 Fittest: 291
-Generation: 57 Fittest: 291
-Generation: 58 Fittest: 291
-Generation: 59 Fittest: 291
-Generation: 60 Fittest: 291
-Generation: 61 Fittest: 291
-Generation: 62 Fittest: 291
-Generation: 63 Fittest: 291
-Generation: 64 Fittest: 291
-Generation: 65 Fittest: 291
-Generation: 66 Fittest: 291
-Generation: 67 Fittest: 291
-Generation: 68 Fittest: 291
-Generation: 69 Fittest: 291
-Generation: 70 Fittest: 291
-Generation: 71 Fittest: 292
-Generation: 72 Fittest: 292
-Generation: 73 Fittest: 292
-Generation: 74 Fittest: 292
-Generation: 75 Fittest: 292
-Generation: 76 Fittest: 292
-Generation: 77 Fittest: 292
-Generation: 78 Fittest: 298
-Generation: 79 Fittest: 298
-Generation: 80 Fittest: 298
-Generation: 81 Fittest: 298
-Generation: 82 Fittest: 298
-Generation: 83 Fittest: 298
-Generation: 84 Fittest: 298
-Generation: 85 Fittest: 298
-Generation: 86 Fittest: 298
-Generation: 87 Fittest: 298
-Generation: 88 Fittest: 298
-Generation: 89 Fittest: 298
-Generation: 90 Fittest: 298
-Generation: 91 Fittest: 298
-Generation: 92 Fittest: 298
-Generation: 93 Fittest: 298
-Generation: 94 Fittest: 298
-Generation: 95 Fittest: 298
-Generation: 96 Fittest: 298
-Generation: 97 Fittest: 298
-Generation: 98 Fittest: 298
 ########
-Run on a population of 12 individuals using Tournament selection and Replacement offspring
-Feasible solution found: 298! Maximum possible is 320
-First generation of solution: 78
-Genes: [ 19 , 19 , 18 , 19 , 19 , 17 , 19 , 18 , 19 , 20 , 19 , 19 , 18 , 19 , 17 , 19 ,  ]
-2015/06/05 15:26:51
+Using http://anjos.mgi.polymtl.ca/qaplib/data.d/nug12.dat 
+Run on a population of 40 individuals using Tournament selection and Replacement offspring
+Average solution found: 589.154 over 1000 iterations!
+ 
+ Total time taken: 452 seconds
+2015/07/12 12:37:00
+
+########
+Using http://anjos.mgi.polymtl.ca/qaplib/data.d/nug12.dat 
+Run on a population of 40 individuals using Proportional selection and Replacement offspring
+Average solution found: 712.952 over 1000 iterations!
+ 
+ Total time taken: 7021 seconds
+2015/07/12 14:34:02
+
+########
+Using http://anjos.mgi.polymtl.ca/qaplib/data.d/nug12.dat 
+Run on a population of 40 individuals using Random selection and Replacement offspring
+Average solution found: 708.658 over 1000 iterations!
+ 
+ Total time taken: 232 seconds
+2015/07/12 14:37:54
+
+########
+Using http://anjos.mgi.polymtl.ca/qaplib/data.d/nug12.dat 
+Run on a population of 40 individuals using Tournament selection and Steady State offspring
+Average solution found: 588.968 over 1000 iterations!
+ 
+ Total time taken: 597 seconds
+2015/07/12 14:47:52
+
+########
+Using http://anjos.mgi.polymtl.ca/qaplib/data.d/nug12.dat 
+Run on a population of 40 individuals using Proportional selection and Steady State offspring
+Average solution found: 642.942 over 1000 iterations!
+ 
+ Total time taken: 7097 seconds
+2015/07/12 16:46:09
+
+########
+Using http://anjos.mgi.polymtl.ca/qaplib/data.d/nug12.dat 
+Run on a population of 40 individuals using Random selection and Steady State offspring
+Average solution found: 635.868 over 1000 iterations!
+ 
+ Total time taken: 490 seconds
+2015/07/12 16:54:20########
+Using http://anjos.mgi.polymtl.ca/qaplib/data.d/nug25.dat 
+Run on a population of 40 individuals using Tournament selection and Replacement offspring . Using elitism with 1 individual(s) 
+Average solution found: 3814.386 over 1000 iterations!
+ 
+ Total time taken: 954 seconds
+2015/07/14 00:31:24
+
+########
+Using http://anjos.mgi.polymtl.ca/qaplib/data.d/nug25.dat 
+Run on a population of 40 individuals using Proportional selection and Replacement offspring . Using elitism with 1 individual(s) 
+Average solution found: 3883.386 over 1000 iterations!
+ 
+ Total time taken: 7313 seconds
+2015/07/14 02:33:18
+
+########
+Using http://anjos.mgi.polymtl.ca/qaplib/data.d/nug25.dat 
+Run on a population of 40 individuals using Random selection and Replacement offspring . Using elitism with 1 individual(s) 
+Average solution found: 3868.51 over 1000 iterations!
+ 
+ Total time taken: 645 seconds
+2015/07/14 02:44:03
+
+########
+Using http://anjos.mgi.polymtl.ca/qaplib/data.d/nug25.dat 
+Run on a population of 40 individuals using Tournament selection and Steady State offspring . Using elitism with 1 individual(s) 
+Average solution found: 3811.068 over 1000 iterations!
+ 
+ Total time taken: 1059 seconds
+2015/07/14 03:01:42
+
+########
+Using http://anjos.mgi.polymtl.ca/qaplib/data.d/nug25.dat 
+Run on a population of 40 individuals using Proportional selection and Steady State offspring . Using elitism with 1 individual(s) 
+Average solution found: 3842.116 over 1000 iterations!
+ 
+ Total time taken: 7406 seconds
+2015/07/14 05:05:09
+
+########
+Using http://anjos.mgi.polymtl.ca/qaplib/data.d/nug25.dat 
+Run on a population of 40 individuals using Random selection and Steady State offspring . Using elitism with 1 individual(s) 
+Average solution found: 3838.894 over 1000 iterations!
+ 
+ Total time taken: 942 seconds
+2015/07/14 05:20:51
