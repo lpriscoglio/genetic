@@ -1,3 +1,6 @@
+package it.GeneticSolver.Entities;
+import it.GeneticSolver.Executors.Fitness;
+
 import java.util.Arrays;
 import java.util.Random;
 
@@ -6,11 +9,11 @@ public class Individual{
 
 	private int possibleGenes;
 	private int [] geneSequence;
-	private int fitnessVal = 0;
+	private int fitnessVal;
 	
 	public Individual(int genes, boolean tempInd)
 	{
-		this.fitnessVal = 0;
+		this.fitnessVal = -1;
 		this.possibleGenes = genes;
 		this.geneSequence = new int[possibleGenes];
 		if(!tempInd)
@@ -19,14 +22,14 @@ public class Individual{
 	
 	public Individual(int genes, int[] genesValues)
 	{
-		this.fitnessVal = 0;
+		this.fitnessVal = -1;
 		this.possibleGenes = genes;
 		this.geneSequence = genesValues;
 	}
-	
+
+    // Inizializzazione random dei geni di ciascuno
 	private void initGenes()
 	{
-        // Inizializzazione random dei geni di ciascuno
 		for (int i = 0; i < possibleGenes; i++) {
             geneSequence[i] = i;
         }    
@@ -52,17 +55,17 @@ public class Individual{
 	public void setGene(int index, int value)
 	{
 		this.geneSequence[index] = value;
-		this.fitnessVal = 0; //
+		this.fitnessVal = -1; //
 	}
 	
-	//Inserisco un nuovo valore in un gene arbitrario, per cui scambio il valore precedente con la posizione dove era prima il valore nuovo, per mantenere la consistenza
+	// Inserisco un nuovo valore in un gene arbitrario, per cui scambio il valore precedente con la posizione 
+	// dove era prima il valore nuovo, per mantenere la consistenza
 	public void swapGenesByInsertion(int index, int value)
 	{
 		int oldVal = this.getGene(index); // Che valore c'era prima dove andrà il nuovo
 		int oldInd = this.findGeneId(value); //Dove era prima il valore mutato
 		this.setGene(index, value);
 		this.setGene(oldInd, oldVal);
-        //System.out.println("New individual: "+ this.toString());
 	}
 	
 	public int findGeneId(int value)
@@ -72,7 +75,7 @@ public class Individual{
 			if(this.getGene(i) == value)
 				return i;
 		}
-		return 0;
+		return -1;
 	}
 	
 	public int count()
@@ -80,8 +83,9 @@ public class Individual{
 		return this.possibleGenes;
 	}
 	
-    public int getFitness() {
-        if (this.fitnessVal == 0) {
+    public int getFitness() 
+    {
+        if (this.fitnessVal == -1) {
             this.fitnessVal = Fitness.getFitness(this);
         }
         return this.fitnessVal;

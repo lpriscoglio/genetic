@@ -1,3 +1,4 @@
+package it.GeneticSolver.Executors;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
@@ -11,7 +12,8 @@ public class InstanceGen {
 	private static int instCount = 0;
 	
 	//Scarico da internet l'istanza voluta
-    public static void setInstanceGen(String url, boolean invert) {
+    public static void setInstanceGen(String url, boolean invert) 
+    {
     	try {
         		URL myUrl = new URL(url);
 				Scanner s = new Scanner(myUrl.openStream());
@@ -31,11 +33,9 @@ public class InstanceGen {
     		catch(IOException ex) {
     			flows = null;
     			distances = null;
-    			ex.printStackTrace(); // for now, simply output it.
     		}
 
     }
-    
 	
 	public static int getInstanceCount()
 	{

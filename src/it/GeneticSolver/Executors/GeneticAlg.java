@@ -1,31 +1,39 @@
+package it.GeneticSolver.Executors;
+import it.GeneticSolver.Entities.Individual;
+import it.GeneticSolver.Entities.Population;
+
+/***
+ *  This static class defines the functions that solve the QAP, by swapping the genes and creating new populations
+ *  */
 public class GeneticAlg {
 
-	
-	/* GA parameters */
+	/* Main hidden and default parameters */
     private static final double crossRate = 0.5;
     //private static final double crossChance = 1;
     private static final double mutationRate = 0.1115;
-    private static final int tournamentSize = 5; // 
+    private static final int tournamentSize = 5; 
     private static boolean elitism = false;
     private static int elitismCount = 1; 
-    private static String selection = "Tournament"; //Tournament / Proportional / Random
-    private static String newPopSelection = "Replacement"; //Replacement / Steady State
-    private static final boolean debug = false; 
-    private static final boolean debugMutation = false;
-    private static final boolean debugCrossover = false;
+    private static String selection = "Tournament"; //Possible values: Tournament / Proportional / Random
+    private static String newPopSelection = "Replacement"; //Possible values: Replacement / Steady State
     private static int elitismOffset = 0;
     public static int mutations = 0;
     private static int geneCount = 0;
+    
+    private static final boolean debug = false; 
+    private static final boolean debugMutation = false;
+    private static final boolean debugCrossover = false;
 
     /* Public methods */
     
-    // Evoluzione
+    // Evolution
     public static Population evolvePopulation(Population pop) {
+    	double [] chancesEagerCalc = getIndividualChances(pop);
         geneCount = pop.getIndividual(0).count();
         Population newPopulation = new Population(pop.count(), geneCount, false);
         newPopulation = pop;
 
-        // Con l'elitism tengo sempre il migliore individuo a prescindere
+        // Elitism maintains always the #elitismCount best individuals
         if (elitism) {
         	Individual temp;
         	for(int i=0; i<elitismCount; i++)
@@ -35,12 +43,9 @@ public class GeneticAlg {
         		newPopulation.saveIndividual(i, newPopulation.getFittest(i));
         		newPopulation.saveIndividual(oldBest, temp);
         	}
-        }
-
-        if(elitism)
-        {
         	elitismOffset = elitismCount;
         }
+
         // Loop over the population size and create new individuals with
         // crossover
         for (int i = elitismOffset; i < pop.count(); i++) {
@@ -53,8 +58,8 @@ public class GeneticAlg {
         	}
         	else if(selection == "Proportional")
         	{
-            	ind1 = proportionalSelection(pop);
-            	ind2 = proportionalSelection(pop);
+            	ind1 = proportionalSelection(pop, chancesEagerCalc);
+            	ind2 = proportionalSelection(pop, chancesEagerCalc);
         	}
         	else
         	{
@@ -68,7 +73,7 @@ public class GeneticAlg {
             Individual newIndiv = crossover(ind1, ind2, geneCount);
             if(newPopSelection == "Replacement")
             	newPopulation.saveIndividual(i, newIndiv);
-            else if(newPopSelection == "Steady State") // Da testare, sembra ok, non ha senso partire da 0 perchè sono i migliori per def TODO
+            else if(newPopSelection == "Steady State")
             {
             	if(newPopulation.getWorst().getFitness() > newIndiv.getFitness())
             		newPopulation.saveIndividual(newPopulation.getWorstId(elitismOffset), newIndiv);
@@ -87,7 +92,6 @@ public class GeneticAlg {
     }
 
     // Crossover -> Scelta di un individuo base, poi scelgo per ognuno quale aggiungere e scambiare, e da quale genitore
-    
     private static Individual crossover(Individual indiv1, Individual indiv2, int genes) {
     	Individual newSol;
     	int gene = (int) Math.round(Math.random() * (indiv1.count()-1));
@@ -108,9 +112,8 @@ public class GeneticAlg {
     			oldGenes[i] = indiv2.getGene(i);
     		}
     		newSol = new Individual(indiv2.count(), oldGenes);
-    		 newSol.swapGenesByInsertion(gene, indiv1.getGene(gene));
+    		newSol.swapGenesByInsertion(gene, indiv1.getGene(gene));
     	}
-
         if(debugCrossover)
         {
 	        System.out.println("###"+gene);
@@ -118,34 +121,19 @@ public class GeneticAlg {
 	        System.out.println("  Parent 2 genes: "+ indiv2.toString());
 	        System.out.println("  NewSol genes: "+ newSol.toString());
         }
-    		
-        /* Loop through genes
-        for (int i = 0; i < genes; i++) {
-            // Crossover
-            if (Math.random() <= crossRate && Math.random() <= crossChance) {
-                newSol.swapGenesByInsertion(i, indiv1.getGene(i));
-            } else {
-                newSol.swapGenesByInsertion(i, indiv2.getGene(i));
-            }
-        }
-        if(debugCrossover)
-        {
-	        System.out.println("  Crossover genes: "+ newSol.toString());
-	        System.out.println("###");
-        }*/
         return newSol;
     }
 
     // Semplice scambio random di location in un individuo
     private static void mutate(Individual indiv, int genes) {
-        // Loop through genes
         for (int i = 0; i < genes; i++) {
             if(debugMutation)
             {
                 System.out.println("###");
                 System.out.println("  Individual was "+indiv.toString());
             }
-            if (Math.random() <= mutationRate) {
+            if (Math.random() <= mutationRate) 
+            {
                 // Create random gene
                 int gene = (int) Math.round(Math.random() * (indiv.count()-1));
                 indiv.swapGenesByInsertion(i, gene);
@@ -159,11 +147,12 @@ public class GeneticAlg {
     }
 
     // Due gruppi di n individui, tra i due migliori di ciascuno viene poi effettuato il crossover
-    private static Individual tournamentSelection(Population pop, int genes) {
-        // Create a tournament population
+    // Create a tournament population
+    // For each place in the tournament get a random individual
+    private static Individual tournamentSelection(Population pop, int genes) 
+    {
     	Individual fittest;
         Population tournament = new Population(tournamentSize, genes, false);
-        // For each place in the tournament get a random individual
         for (int i = 0; i < tournamentSize; i++) {
             int randomId = (int) (Math.random() * pop.count());
             tournament.saveIndividual(i, pop.getIndividual(randomId));
@@ -172,11 +161,9 @@ public class GeneticAlg {
         return fittest;
     }
     
-    // Viene scelto un individuo con probabilità proporzionale alla sua fitness rispetto agli altri.. se è
-    // molto grande viene scelto con grande probabilità, etc
-    private static Individual proportionalSelection(Population tournament) {
-    	
-        // Individuals with their chances
+	// Individuals with their chances
+    private static double[] getIndividualChances(Population tournament)
+    {
     	double [] chances = new double [tournament.count()+1];
     	chances[0] = 0;
     	int totalFitness = 0;
@@ -196,7 +183,6 @@ public class GeneticAlg {
 	        	}
     		}
     	}
-    	
     	if(debug)
     	{
 	        System.out.println("### TOTAL FITNESS: "+totalFitness);
@@ -206,8 +192,13 @@ public class GeneticAlg {
 	    	}
 	        System.out.println("###");
     	}
-    	
-        // Select random individual depending on its fitness
+    	return chances;
+    }
+    
+    // Viene scelto un individuo con probabilità proporzionale alla sua fitness rispetto agli altri.. se è
+    // molto grande viene scelto con grande probabilità, etc
+	// Select random individual depending on its fitness
+    private static Individual proportionalSelection(Population tournament, double [] chances) {
         double randomId = Math.random();
         for (int i = 0; i < tournament.count(); i++) {
         	if(randomId <= chances[i])

@@ -1,10 +1,12 @@
+package it.GeneticSolver.Executors;
+import it.GeneticSolver.Entities.Individual;
 
+
+/* Public methods for the evaluation of QAP Fitness Functions */
 public class Fitness {
 
-    /* Public methods */
-
-    // Calcolo funzione di Fitness
-	static int getFitness(Individual individual) {
+    // Evaluation of fitness function for a given individual
+	public static int getFitness(Individual individual) {
         int fitness = 0;
         int[][] flows = InstanceGen.getFlows();
         int[][] distances = InstanceGen.getDistances();
@@ -17,8 +19,8 @@ public class Fitness {
         return fitness;
     }
     
-    // Soluzione migliore possibile, andrebbe letta da internet come le matrici
-    static int getMaxFitness() {
+    // Best possible solution; TBD
+    public static int getMaxFitness() {
         int maxFitness = 20*16;
         return maxFitness;
     }
