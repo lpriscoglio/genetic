@@ -27,8 +27,10 @@ public class Individual{
 		this.geneSequence = genesValues;
 	}
 
-    // Inizializzazione random dei geni di ciascuno
-	private void initGenes()
+	/***
+	 * Inizializzazione random dei geni dell'individuo
+	 */
+    public void initGenes()
 	{
 		for (int i = 0; i < possibleGenes; i++) {
             geneSequence[i] = i;
@@ -42,9 +44,11 @@ public class Individual{
           geneSequence[i] = a;
         }
 	}
+	
 	public int getGene(int index)
 	{
-		return this.geneSequence[index];
+		int currIndex = checkConsistency(index);
+		return this.geneSequence[currIndex];
 	}
 
 	public int [] getGenes()
@@ -54,25 +58,36 @@ public class Individual{
 	
 	public void setGene(int index, int value)
 	{
-		this.geneSequence[index] = value;
+		int currValue = checkConsistency(value);
+		int currIndex = checkConsistency(index);
+		this.geneSequence[currIndex] = currValue;
 		this.fitnessVal = -1; //
 	}
 	
-	// Inserisco un nuovo valore in un gene arbitrario, per cui scambio il valore precedente con la posizione 
-	// dove era prima il valore nuovo, per mantenere la consistenza
+	/***
+	 * 
+	 * Per mantenere la consistenza, inserire un valore a un indice significa scambiare di posizione il valore
+	 * attualmente presente nella posizione index con la posizione in cui è già presente il valore value
+	 * @param index
+	 * @param value
+	 */
+	
 	public void swapGenesByInsertion(int index, int value)
 	{
-		int oldVal = this.getGene(index); // Che valore c'era prima dove andrà il nuovo
-		int oldInd = this.findGeneId(value); //Dove era prima il valore mutato
-		this.setGene(index, value);
+		int currValue = checkConsistency(value);
+		int currIndex = checkConsistency(index);
+		int oldVal = this.getGene(currIndex); // Che valore c'era prima dove andrà il nuovo
+		int oldInd = this.findGeneId(currValue); //Dove era prima il valore mutato
+		this.setGene(currIndex, currValue);
 		this.setGene(oldInd, oldVal);
 	}
 	
 	public int findGeneId(int value)
 	{
+		int currValue = checkConsistency(value);
 		for(int i = 0; i<this.count(); i++)
 		{
-			if(this.getGene(i) == value)
+			if(this.getGene(i) == currValue)
 				return i;
 		}
 		return -1;
@@ -83,6 +98,11 @@ public class Individual{
 		return this.possibleGenes;
 	}
 	
+	/***
+	 * Ottengo la fitness dell'individuo, per convenzione con valore -1 non è stata ancora calcolata
+	 * o i geni sono stati modificati, quindi viene ricalcolata by need.
+	 * @return
+	 */
     public int getFitness() 
     {
         if (this.fitnessVal == -1) {
@@ -91,17 +111,22 @@ public class Individual{
         return this.fitnessVal;
     }
     
+    /***
+     * Geni e posizioni possono essere solo nell'intervallo 0 : n-1
+     * @param toCheck
+     * @return
+     */
+    private int checkConsistency(int toCheck)
+    {
+    	if(toCheck < 0)
+    		return 0;
+    	if(toCheck >= this.possibleGenes)
+    		return this.possibleGenes-1;
+    	return toCheck;
+    }
+    
     @Override
     public String toString() {
         return Arrays.toString(this.geneSequence);
-    }
-    @Override
-    public Individual clone()
-    {
-    	try {
-    		return (Individual) super.clone();
-    	} catch (CloneNotSupportedException e) {
-    		throw new RuntimeException(e);
-    	}
     }
 }

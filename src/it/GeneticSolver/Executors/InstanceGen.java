@@ -34,7 +34,6 @@ public class InstanceGen {
     			flows = null;
     			distances = null;
     		}
-
     }
 	
 	public static int getInstanceCount()
